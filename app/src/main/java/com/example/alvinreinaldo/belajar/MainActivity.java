@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Artist artist = artistList.get(position);
 
-                showUpdateDialog(artist.getArtistId(),artist.getArtistName());
+                showUpdateDialog(artist.getArtistId(),artist.getArtistName(),artist.getArtistGenre());
 
                 return false;
             }
@@ -110,7 +110,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void showUpdateDialog(final String artistId, String artistName){
+    private int getIndex(Spinner spinner, String myString){
+
+        int index = 0;
+
+        for (int i=0;i<spinner.getCount();i++){
+            if (spinner.getItemAtPosition(i).equals(myString)){
+                index = i;
+            }
+        }
+        return index;
+    }
+    private void showUpdateDialog(final String artistId, String artistName,String artistGenre){
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.update_dialog,null);
@@ -120,8 +131,8 @@ public class MainActivity extends AppCompatActivity {
         final Button buttonUpdate = (Button) dialogView.findViewById(R.id.buttonUpdate);
         final Spinner spinnerGenres = (Spinner) dialogView.findViewById(R.id.spinnerGenresUpdate);
         final Button buttonDelete = (Button) dialogView.findViewById(R.id.buttonDelete);
-
-        dialogBuilder.setTitle("Updating Artist"+artistName);
+        spinnerGenres.setSelection(getIndex(spinnerGenres,artistGenre));
+        dialogBuilder.setTitle("Updating Artist "+artistName+" "+artistId);
 
         final AlertDialog alertDialog =dialogBuilder.create();
         alertDialog.show();
@@ -134,28 +145,29 @@ public class MainActivity extends AppCompatActivity {
                     editTextName.setError("Name required");
                     return;
                 }
-                updateArtist(artistId);
+                updateArtist(artistId,name,genre);
                 alertDialog.dismiss();
             }
         });
         buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteArtist(artistId)
+                deleteArtist(artistId);
+                alertDialog.dismiss();
             }
         });
     }
 
     private boolean updateArtist(String id, String name,String genre){
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("artist").child(id);
+        DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("artists").child(id);
         Artist artist = new Artist(id,name,genre);
-        databaseReference.setValue(artist);
+        databaseReference2.setValue(artist);
         Toast.makeText(this,"Artist Updated Successfully",Toast.LENGTH_LONG).show();
         return true;
     }
 
     private void deleteArtist(String id){
-        DatabaseReference drArtist = FirebaseDatabase.getInstance().getReference("artist").child(id);
+        DatabaseReference drArtist = FirebaseDatabase.getInstance().getReference("artists").child(id);
         DatabaseReference drTracks = FirebaseDatabase.getInstance().getReference("tracks").child(id);
 
         drArtist.removeValue();

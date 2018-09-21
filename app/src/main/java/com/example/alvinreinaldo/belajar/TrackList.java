@@ -15,7 +15,7 @@ public class TrackList extends ArrayAdapter<Track>{
     private Activity context;
     private List<Track> trackList;
 
-    public TrackList(Activity context,List<Artist> trackList){
+    public TrackList(Activity context,List<Track> trackList){
         super(context,R.layout.layout_track_list , trackList);
         this.context = context;
         this.trackList = trackList;

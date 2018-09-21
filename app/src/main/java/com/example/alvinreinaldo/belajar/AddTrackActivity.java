@@ -77,7 +77,7 @@ public class AddTrackActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        })
+        });
     }
 
     private void saveTrack(){
